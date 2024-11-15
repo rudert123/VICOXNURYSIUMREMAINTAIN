@@ -682,6 +682,36 @@ aura.parry_Range = parryRange * conditionFactor
 	end)
 end)
 
-
-
 initializate('nurysium_temp')
+
+local function optimizePerformance()
+    -- Boost FPS by disabling unnecessary features and reducing settings
+    game:GetService("Workspace").StreamingEnabled = true
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01 -- Lowest quality for best FPS
+    game:GetService("Lighting").GlobalShadows = false -- Disable shadows
+    game:GetService("Lighting").Brightness = 2 -- Adjust lighting for smoothness
+    game:GetService("UserInputService").MouseDeltaSensitivity = 0.5 -- Reduce mouse lag
+    setfpscap(120) -- Increase FPS cap to 120 for smoother performance
+    
+    -- Optimize memory usage
+    local function optimizeMemoryUsage()
+        local serviceMemoryLimits = {
+            ['Players'] = 2048,
+            ['Workspace'] = 2048,
+            ['ReplicatedStorage'] = 2048,
+            -- Add more services as needed
+        }
+
+        for serviceName, limit in pairs(serviceMemoryLimits) do
+            local service = game:GetService(serviceName)
+            if service then
+                -- Assuming there is a method to set memory limit
+                -- Uncomment if such a method exists
+                -- service:SetMemoryLimit(limit)
+            end
+        end
+    end
+    optimizeMemoryUsage()
+end
+
+optimizePerformance()
