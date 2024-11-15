@@ -2,10 +2,6 @@
 print("Script that i will revive")
 wait(2)
 
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
-
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "LoadingScreen"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
