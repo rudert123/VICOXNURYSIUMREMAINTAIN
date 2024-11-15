@@ -13,7 +13,7 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(1, 0, 1, 0)
 frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-frame.BackgroundTransparency = 0.7
+frame.BackgroundTransparency = 0.6
 frame.Parent = screenGui
 
 local uiGradient = Instance.new("UIGradient")
@@ -24,23 +24,35 @@ uiGradient.Rotation = 45
 local textLabel = Instance.new("TextLabel")
 textLabel.Text = "Credit\nRudert\nFless PE"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.TextSize = 48
-textLabel.TextStrokeTransparency = 0.8
+textLabel.TextSize = 36
+textLabel.TextStrokeTransparency = 0.6
 textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 textLabel.TextWrapped = true
-textLabel.Size = UDim2.new(0, 600, 0, 200)
-textLabel.Position = UDim2.new(0.5, -300, 0.5, -100)
-textLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Ganti TextAlignment dengan TextXAlignment
-textLabel.TextYAlignment = Enum.TextYAlignment.Center  -- Ganti TextAlignment dengan TextYAlignment
+textLabel.Size = UDim2.new(0, 500, 0, 150)
+textLabel.Position = UDim2.new(0.5, -250, 0.5, -75)
+textLabel.TextXAlignment = Enum.TextXAlignment.Center
+textLabel.TextYAlignment = Enum.TextYAlignment.Center
 textLabel.Parent = frame
+
+local border = Instance.new("UICorner")
+border.CornerRadius = UDim.new(0, 10)
+border.Parent = textLabel
+
+local shadow = Instance.new("Frame")
+shadow.Size = UDim2.new(1, 6, 1, 6)
+shadow.Position = UDim2.new(0, 3, 0, 3)
+shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+shadow.BackgroundTransparency = 0.5
+shadow.ZIndex = textLabel.ZIndex - 1
+shadow.Parent = textLabel
 
 local tweenService = game:GetService("TweenService")
 
 local fadeInTweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-local fadeInTween = tweenService:Create(textLabel, fadeInTweenInfo, {TextTransparency = 0, Position = UDim2.new(0.5, -300, 0.5, -100)})
+local fadeInTween = tweenService:Create(textLabel, fadeInTweenInfo, {TextTransparency = 0, Position = UDim2.new(0.5, -250, 0.5, -75)})
 
 local moveUpTweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-local moveUpTween = tweenService:Create(textLabel, moveUpTweenInfo, {Position = UDim2.new(0.5, -300, 0.5, -200)})
+local moveUpTween = tweenService:Create(textLabel, moveUpTweenInfo, {Position = UDim2.new(0.5, -250, 0.5, -150)})
 
 local fadeOutTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
 local fadeOutTween = tweenService:Create(textLabel, fadeOutTweenInfo, {TextTransparency = 1})
@@ -59,6 +71,7 @@ fadeInTween.Completed:Connect(function()
         end)
     end)
 end)
+
 
 local version = 'Beta'
 
