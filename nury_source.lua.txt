@@ -1,10 +1,16 @@
---// nurysium recode
+--// Vico (Rudert) Recode
+print("Script that i will revive")
+wait(2)
 
-local version = '0.3.0'
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+local version = 'Beta'
 
 print('nurysium llc. - https://dsc.gg/nurysium')
 print(version)
-warn('use new version...')
+warn('not availabe for all this is beta version...')
 
 setfpscap(165)
 
@@ -45,7 +51,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/flezz
 task.wait(0.5)
 
 --// Yes, you can rename, I don't mind 🌠
-library:init("https://dsc.gg/nurysium", game:GetService("UserInputService").TouchEnabled, game:GetService("CoreGui"))
+library:init("VicoXNurysium", game:GetService("UserInputService").TouchEnabled, game:GetService("CoreGui"))
 
 library:create_section("Combat", 17440545793)
 library:create_section("World", 17440865331)
@@ -90,22 +96,30 @@ local function get_center()
 	end
 end
 
---// Thanks Aries for this.
-function resolve_parry_Remote()
-	for _, value in Services do
-		local temp_remote = value:FindFirstChildOfClass('RemoteEvent')
+function resolve_parry_remote()
+    while true do
+        local found = false
+        for _, object in { cloneref(game:GetService('VirtualUser')) } do
+            local temp_remote = object:FindFirstChildOfClass('RemoteEvent')
 
-		if not temp_remote then
-			continue
-		end
+            if temp_remote and temp_remote.Name:find('\n') then
+                parry_remote = temp_remote
+                found = true
+                break
+            end
+        end
 
-		if not temp_remote.Name:find('\n') then
-			continue
-		end
+        -- Jika remote sudah ditemukan, keluar dari loop
+        if found then
+            break
+        end
 
-		parry_remote = temp_remote
-	end
+        -- Tunggu sebelum mencoba lagi untuk mencegah lag
+        wait(0)
+    end
 end
+
+AutoParry.get_parry_remote()
 
 function walk_to(position)
 	local_player.Character.Humanoid:MoveTo(position)
