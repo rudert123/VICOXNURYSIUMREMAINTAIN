@@ -96,7 +96,7 @@ local function get_center()
 	end
 end
 
-function resolve_parry_remote()
+function resolve_parry_Remote()
     while true do
         local found = false
         for _, object in { game:GetService("VirtualUser") } do
@@ -119,14 +119,13 @@ function resolve_parry_remote()
     end
 end
 
-resolve_parry_remote()
+resolve_parry_Remote()
 
 function walk_to(position)
 	local_player.Character.Humanoid:MoveTo(position)
 end
 
 library:create_toggle("Attack Aura", "Combat", function(toggled)
-	resolve_parry_Remote()
 	getgenv().aura_Enabled = toggled
 end)
 
