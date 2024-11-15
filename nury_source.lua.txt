@@ -119,7 +119,7 @@ function resolve_parry_remote()
     end
 end
 
-AutoParry.get_parry_remote()
+resolve_parry_remote()
 
 function walk_to(position)
 	local_player.Character.Humanoid:MoveTo(position)
