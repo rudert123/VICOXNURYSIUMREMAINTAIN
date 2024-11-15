@@ -426,7 +426,7 @@ task.spawn(function()
 				if aura.is_spamming then
 					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then   
 						parry_remote:FireServer(
-							0.5,
+							0,
 							CFrame.new(camera.CFrame.Position, Vector3.zero),
 							{[closest_Entity.Name] = closest_Entity.HumanoidRootPart.Position},
 							{closest_Entity.HumanoidRootPart.Position.X, closest_Entity.HumanoidRootPart.Position.Y},
@@ -459,7 +459,7 @@ if serverStatsItem then
     -- Ambil nilai ping dan pastikan itu valid
     local pingValue = serverStatsItem:GetValue()
     if pingValue then
-        ping = pingValue / 10  -- Mengurangi skala sesuai kebutuhan
+        ping = pingValue / 100  -- Mengurangi skala sesuai kebutuhan
     end
 end
 
@@ -509,7 +509,24 @@ end
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
 		aura.spam_Range = math.max(ping / 10, 10.5) + ball_Speed / 6.15
-		aura.parry_Range = math.max(math.max(ping, 3.5) + ball_Speed / 3.25, 9.5)
+		local ping = math.max(ping, 0)
+local ball_Speed = math.max(ball_Speed, 0)
+
+local minPing = 3.5
+local pingValue = math.max(ping, minPing)
+
+local conditionFactor = 1
+if playerHasBuff then
+    conditionFactor = 1.2
+end
+
+local speedFactor = 3.25
+local ballSpeedEffect = ball_Speed / speedFactor
+
+local minParryRange = 9.5
+local parryRange = math.max(pingValue + ballSpeedEffect, minParryRange)
+
+aura.parry_Range = parryRange * conditionFactor
 
 		if target_isMoving then
             aura.is_spamming = (aura.hit_Count > 1 or (target_Distance < 11 and ball_Distance < 10)) and ball_Dot > -0.25
