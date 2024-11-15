@@ -572,8 +572,10 @@ task.spawn(function()
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
                 aura.spam_Range = math.max(ping / 10, 10.5) + ball_Speed / 6.15
-		aura.parry_Range =
-ping + ball_Speed / math.pi
+		local pingFactor = ping / 1000 * 1.5       -- Menambahkan pengaruh ping yang lebih besar
+local ballSpeedFactor = ball_Speed / math.pi * 0.8  -- Mengurangi pengaruh ballSpeed lebih jauh
+
+aura.parry_Range = pingFactor + ballSpeedFactor
 
 		if target_isMoving then
             aura.is_spamming = (aura.hit_Count > 1 or (target_Distance < 11 and ball_Distance < 10)) and ball_Dot > -0.25
