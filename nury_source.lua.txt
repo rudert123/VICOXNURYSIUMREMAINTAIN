@@ -108,13 +108,16 @@ getgenv().trail_Enabled = false
 getgenv().self_effect_Enabled = false
 getgenv().kill_effect_Enabled = false
 getgenv().shaders_effect_Enabled = false
-getgenv().ai_Enabled = false
 getgenv().spectate_Enabled = false
 
 local Services = {
 	game:GetService('AdService'),
 	game:GetService('SocialService')
 }
+
+local RunTime = workspace.Runtime
+local Alive = workspace.Alive
+local Dead = workspace.Dead
 
 --// aura
 
@@ -376,44 +379,6 @@ function AutoParry.perform_parry()
 		AutoParry.perform_grab_animation()
 
 		ball_properties.cooldown = true
-	
-		local current_curve
-
-		if current_curve == 'Linear' then
-			direction = CFrame.new(LocalPlayer.Character.PrimaryPart.Position, target_position)
-		end
-
-		if current_curve == 'Backwards' then
-			direction = CFrame.new(camera_direction, (camera_direction + (-camera.CFrame.LookVector * 10000)) + Vector3.new(0, 1000, 0))
-		end
-	
-		if current_curve == 'Random' then
-			direction = CFrame.new(LocalPlayer.Character.PrimaryPart.Position, Vector3.new(math.random(-1000, 1000), math.random(-350, 1000), math.random(-1000, 1000)))
-		end
-	
-		if current_curve == 'Accelerated' then
-			direction = CFrame.new(LocalPlayer.Character.PrimaryPart.Position, target_position + Vector3.new(0, 150, 0))
-		end
-	else
-		direction = CFrame.new(camera_direction, target_position + Vector3.new(0, 60, 0))
-
-		ball_properties.parry_remote:FireServer(
-			0,
-			direction,
-			{ [AutoParry.target.aim.Name] = target_position },
-			{ target_position.X, target_position.Y },
-			false
-		)
-	
-		task.delay(0.25, function()
-			if ball_properties.parries > 0 then
-				ball_properties.parries -= 1
-			end
-		end)
-
-		return
-	end
-
 	ball_properties.parry_remote:FireServer(
 		0.5,
 		direction,
@@ -850,10 +815,6 @@ library:create_toggle("Attack Aura", "Combat", function(toggled)
 	getgenv().auto_parry_enabled = toggled
 end)
 
-library:create_toggle("AI", "Combat", function(toggled)
-	getgenv().ai_Enabled = toggled
-end)
-
 library:create_toggle("Hit Sound", "Combat", function(toggled)
 	getgenv().hit_sound_Enabled = toggled
 end)
@@ -1057,71 +1018,6 @@ ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
 	end
 end)
 
---// AI
-
-task.defer(function()
-    game:GetService("RunService").Heartbeat:Connect(function()
-        if getgenv().ai_Enabled and workspace.Alive:FindFirstChild(local_player.Character.Name) then
-            local self = Nurysium_Util.getBall()
-
-            if not self or not closest_Entity then
-                return
-            end
-
-            if not closest_Entity:FindFirstChild('HumanoidRootPart') then
-                walk_to(local_player.Character.HumanoidRootPart.Position + Vector3.new(math.sin(tick()) * math.random(35, 50), 0, math.cos(tick()) * math.random(35, 50)))
-                return
-            end
-
-            local ball_Position = self.Position
-            local ball_Speed = self.AssemblyLinearVelocity.Magnitude
-            local ball_Distance = local_player:DistanceFromCharacter(ball_Position)
-
-            local player_Position = local_player.Character.PrimaryPart.Position
-
-            local target_Position = closest_Entity.HumanoidRootPart.Position
-            local target_Distance = local_player:DistanceFromCharacter(target_Position)
-            local target_LookVector = closest_Entity.HumanoidRootPart.CFrame.LookVector
-
-            local resolved_Position = Vector3.zero
-
-            local target_Humanoid = closest_Entity:FindFirstChildOfClass("Humanoid")
-            if target_Humanoid and target_Humanoid:GetState() == Enum.HumanoidStateType.Jumping and local_player.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
-                local_player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-
-            if (ball_Position - player_Position):Dot(local_player.Character.PrimaryPart.CFrame.LookVector) < -0.2 and tick() % 4 <= 2 then
-                return
-            end
-
-            if tick() % 4 <= 2 then
-                if target_Distance > 10 then
-                    resolved_Position = target_Position + (player_Position - target_Position).Unit * 8
-                else
-                    resolved_Position = target_Position + (player_Position - target_Position).Unit * 25
-                end
-            else
-                resolved_Position = target_Position - target_LookVector * (math.random(8.5, 13.5) + (ball_Distance / math.random(8, 20)))
-            end
-
-            if (player_Position - target_Position).Magnitude < 8 then
-                resolved_Position = target_Position + (player_Position - target_Position).Unit * 35
-            end
-
-            if ball_Distance < 8 then
-                resolved_Position = player_Position + (player_Position - ball_Position).Unit * 10
-            end
-
-            if aura.is_spamming then
-                resolved_Position = player_Position + (ball_Position - player_Position).Unit * 10
-            end
-
-            walk_to(resolved_Position + Vector3.new(math.sin(tick()) * 10, 0, math.cos(tick()) * 10))
-        end
-    end)
-end)
-
-
 ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function()
 	aura.hit_Count += 1
 
@@ -1131,9 +1027,9 @@ ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function()
 end)
 
 ConnectionsManager['auto_parry'] = RunService.PostSimulation:Connect(function()
-	local auto_parry_enabled
+	local getgenv().auto_parry_enabled
 
-	if not auto_parry_enabled then
+	if not getgenv().auto_parry_enabled then
 		AutoParry.reset()
 
         return
