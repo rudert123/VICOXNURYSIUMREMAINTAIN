@@ -572,10 +572,26 @@ task.spawn(function()
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
                 aura.spam_Range = math.max(ping / 10, 10.5) + ball_Speed / 6.15
-		local pingFactor = ping / 1000 * 1.5       -- Menambahkan pengaruh ping yang lebih besar
-local ballSpeedFactor = ball_Speed / math.pi * 0.8  -- Mengurangi pengaruh ballSpeed lebih jauh
+		local speed_factor = 10    -- Faktor penyesuaian kecepatan bola
+local max_parry_range = math.huge -- Batas atas jarak parry
+local min_parry_range = 5  -- Batas bawah jarak parry
+local power = 1.5          -- Faktor daya untuk memperbesar pengaruh kecepatan
+local percentage = 0.25    -- Pengaruh kecepatan bola sebagai persentase
+local log_base = 10        -- Basis logaritma untuk kecepatan bola
 
-aura.parry_Range = pingFactor + ballSpeedFactor
+-- Rumus penggabungan
+aura.parry_Range = ping_threshold + 
+    math.max(                          -- Menggunakan max untuk memastikan nilai tidak terlalu kecil
+        math.min(                        -- Menggunakan min untuk membatasi nilai kecepatan
+            math.pow(                    -- Memperbesar pengaruh kecepatan bola dengan daya
+                math.abs(ball_Speed) / speed_factor, power
+            ),
+            max_parry_range             -- Membatasi agar parry_range tidak lebih dari max_parry_range
+        ),
+        min_parry_range,                 -- Membatasi agar parry_range tidak kurang dari min_parry_range
+    ) + math.log(                        -- Menambahkan pengaruh logaritma untuk pertumbuhan lebih lambat
+        math.abs(ball_Speed) / speed_factor + 1, log_base
+    ) * percentage
 
 		if target_isMoving then
             aura.is_spamming = (aura.hit_Count > 1 or (target_Distance < 11 and ball_Distance < 10)) and ball_Dot > -0.25
