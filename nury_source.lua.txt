@@ -6,6 +6,50 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LoadingScreen"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BackgroundTransparency = 0.5
+frame.Parent = screenGui
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Text = "Credit\nRudert\nFless PE"
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.TextSize = 36
+textLabel.TextWrapped = true
+textLabel.Size = UDim2.new(0, 400, 0, 200)
+textLabel.Position = UDim2.new(0.5, -200, 0.5, -100)
+textLabel.Parent = frame
+
+local tweenService = game:GetService("TweenService")
+
+local fadeInTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
+local fadeInTween = tweenService:Create(textLabel, fadeInTweenInfo, {TextTransparency = 0})
+
+local fadeOutTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
+local fadeOutTween = tweenService:Create(textLabel, fadeOutTweenInfo, {TextTransparency = 1})
+
+local moveTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0)
+local moveTween = tweenService:Create(textLabel, moveTweenInfo, {Position = UDim2.new(0.5, -200, 0.5, -200)})
+
+fadeInTween:Play()
+
+wait(2)
+
+moveTween:Play()
+
+wait(2)
+
+fadeOutTween:Play()
+
+fadeOutTween.Completed:Connect(function()
+    screenGui:Destroy()
+end)
+
 local version = 'Beta'
 
 print('nurysium llc. - https://dsc.gg/nurysium')
