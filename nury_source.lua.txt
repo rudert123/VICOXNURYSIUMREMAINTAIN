@@ -19,7 +19,8 @@ local Players = game:GetService('Players')
 local RunService = game:GetService('RunService')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local TweenService = game:GetService('TweenService')
-
+local VirtualUser =
+game:GetService("VirtualUser")
 local Nurysium_Util = loadstring(game:HttpGet('https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua'))()
 
 local local_player = Players.LocalPlayer
@@ -98,7 +99,7 @@ end
 function resolve_parry_remote()
     while true do
         local found = false
-        for _, object in { cloneref(game:GetService('VirtualUser')) } do
+        for _, object in { game:GetService("VirtualUser") } do
             local temp_remote = object:FindFirstChildOfClass('RemoteEvent')
 
             if temp_remote and temp_remote.Name:find('\n') then
