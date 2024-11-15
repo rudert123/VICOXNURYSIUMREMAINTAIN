@@ -2,10 +2,6 @@
 print("Script that i will revive!")
 wait(2)
 
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
-
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "LoadingScreen"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -605,22 +601,27 @@ ping + ball_Speed / math.pi
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
 
-            if getgenv().auto_curve_Enabled 
-parry_remote:FireServer(
-				0,
-				CFrame.new(camera.CFrame.Position, Vector3.new(math.random(-1000, 1000), math.random(0, 1000), math.random(100, 1000))),
-				{[closest_Entity.Name] = target_Position},
-				{target_Position.X, target_Position.Y},
-				false
-			)
-                 else
-            parry_remote:FireServer(
-                0.5,
-                parry_CFrame,
-                {[closest_Entity.Name] = target_Position},
-                {target_Position.X, target_Position.Y},
-                false
-            )
+            if getgenv().auto_curve_Enabled then
+    parry_remote:FireServer(
+        0,
+        CFrame.new(camera.CFrame.Position, Vector3.new(
+            math.random(-1000, 1000),
+            math.random(0, 1000),
+            math.random(100, 1000)
+        )),
+        {[closest_Entity.Name] = target_Position},
+        {target_Position.X, target_Position.Y},
+        false
+    )
+else
+    parry_remote:FireServer(
+        0.5,
+        parry_CFrame,
+        {[closest_Entity.Name] = target_Position},
+        {target_Position.X, target_Position.Y},
+        false
+    )
+end
 
 			aura.can_parry = false
 			aura.hit_Time = tick()
