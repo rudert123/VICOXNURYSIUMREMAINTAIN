@@ -628,8 +628,8 @@ task.spawn(function()
 		local target_isMoving = target_Velocity.Magnitude > 0
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
-                aura_table.spam_Range = math.max(ping / 10, 15) + ball_Speed / 7
-		aura_table.parry_Range =
+                aura.spam_Range = math.max(ping / 10, 15) + ball_Speed / 7
+		aura.parry_Range =
 ping + ball_Speed / math.pi
 
 		if target_isMoving then
