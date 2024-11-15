@@ -24,7 +24,7 @@ uiGradient.Rotation = 45
 local textLabel = Instance.new("TextLabel")
 textLabel.Text = "Credit\nRudert\nFless PE"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.TextSize = 36
+textLabel.TextSize = 45
 textLabel.TextStrokeTransparency = 0.6
 textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 textLabel.TextWrapped = true
@@ -98,6 +98,7 @@ local closest_Entity = nil
 local parry_remote = nil
 
 getgenv().visualize_Enabled = false
+getgenv().auto_curve_Enabled = false
 getgenv().aura_Enabled = false
 getgenv().hit_sound_Enabled = false
 getgenv().hit_effect_Enabled = false
@@ -254,6 +255,10 @@ end)
 
 library:create_toggle("Visualizer", "Combat", function(toggled)
 	getgenv().visualize_Enabled = toggled
+end)
+
+library:create_toggle("Curve", "Combat", function(toggled)
+	getgenv().auto_curve_Enabled = toggled
 end)
 
 library:create_toggle("Attack Aura", "Combat", function(toggled)
@@ -577,17 +582,7 @@ task.spawn(function()
 			aura.last_target = nil
 		end)
 
-		local ping = 0
-
--- Pastikan statistik jaringan tersedia
-local serverStatsItem = Stats.Network.ServerStatsItem:FindFirstChild('Data Ping')
-if serverStatsItem then
-    -- Ambil nilai ping dan pastikan itu valid
-    local pingValue = serverStatsItem:GetValue()
-    if pingValue then
-        ping = pingValue / 100  -- Mengurangi skala sesuai kebutuhan
-    end
-end
+		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
 
 		local self = Nurysium_Util.getBall()
 
@@ -634,25 +629,9 @@ end
 		local target_isMoving = target_Velocity.Magnitude > 0
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
-		aura.spam_Range = math.max(ping / 10, 10.5) + ball_Speed / 6.15
-		local ping = math.max(ping, 0)
-local ball_Speed = math.max(ball_Speed, 0)
-
-local minPing = 3.5
-local pingValue = math.max(ping, minPing)
-
-local conditionFactor = 1
-if playerHasBuff then
-    conditionFactor = 1.2
-end
-
-local speedFactor = 3.25
-local ballSpeedEffect = ball_Speed / speedFactor
-
-local minParryRange = 9.5
-local parryRange = math.max(pingValue + ballSpeedEffect, minParryRange)
-
-aura.parry_Range = parryRange * conditionFactor
+                aura_table.spam_Range = math.max(ping / 10, 15) + ball_Speed / 7
+		aura_table.parry_Range =
+ping + ball_Speed / math.pi
 
 		if target_isMoving then
             aura.is_spamming = (aura.hit_Count > 1 or (target_Distance < 11 and ball_Distance < 10)) and ball_Dot > -0.25
@@ -679,13 +658,28 @@ aura.parry_Range = parryRange * conditionFactor
 		end)
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
-			parry_remote:FireServer(
-				0.5,
-				CFrame.new(camera.CFrame.Position, Vector3.new(math.random(-1000, 1000), math.random(0, 1000), math.random(100, 1000))),
-				{[closest_Entity.Name] = target_Position},
-				{target_Position.X, target_Position.Y},
-				false
-			)
+
+            local curve_intensity = 1.5
+            local random_curve = Vector3.new(
+                math.random(-150, 150) * curve_intensity,
+                math.random(-150, 150) * curve_intensity,
+                math.random(-150, 150) * curve_intensity
+            )
+
+            local parry_CFrame
+            if getgenv().auto_curve_Enabled and math.random() < 0.9 then
+                parry_CFrame = CFrame.new(camera.CFrame.Position, target_Position + random_curve)
+            else
+                parry_CFrame = CFrame.new(camera.CFrame.Position, target_Position)
+            end
+
+            parry_remote:FireServer(
+                0.5,
+                parry_CFrame,
+                {[closest_Entity.Name] = target_Position},
+                {target_Position.X, target_Position.Y},
+                false
+            )
 
 			aura.can_parry = false
 			aura.hit_Time = tick()
