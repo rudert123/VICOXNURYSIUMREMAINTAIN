@@ -97,26 +97,17 @@ local function get_center()
 end
 
 function resolve_parry_Remote()
-    while true do
-        local found = false
-        for _, object in { game:GetService("VirtualUser") } do
-            local temp_remote = object:FindFirstChildOfClass('RemoteEvent')
+ local temp_remote = game:GetService("VirtualUser"):WaitForChild("\n\n\n\n\n")
 
-            if temp_remote and temp_remote.Name:find('\n') then
-                parry_remote = temp_remote
-                found = true
-                break
-            end
-        end
-
-        -- Jika remote sudah ditemukan, keluar dari loop
-        if found then
-            break
-        end
-
-        -- Tunggu sebelum mencoba lagi untuk mencegah lag
-        wait(0)
+    if not temp_remote then
+        return
     end
+
+    if not temp_remote:IsA('RemoteEvent') then
+        return
+    end
+
+    parry_remote = temp_remote
 end
 
 resolve_parry_Remote()
@@ -462,7 +453,18 @@ task.spawn(function()
 			aura.last_target = nil
 		end)
 
-		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
+		local ping = 0
+
+-- Pastikan statistik jaringan tersedia
+local serverStatsItem = Stats.Network.ServerStatsItem:FindFirstChild('Data Ping')
+if serverStatsItem then
+    -- Ambil nilai ping dan pastikan itu valid
+    local pingValue = serverStatsItem:GetValue()
+    if pingValue then
+        ping = pingValue / 10  -- Mengurangi skala sesuai kebutuhan
+    end
+end
+
 		local self = Nurysium_Util.getBall()
 
 		if not self then
