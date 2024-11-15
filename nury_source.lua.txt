@@ -12,8 +12,6 @@ print('nurysium llc. - https://dsc.gg/nurysium')
 print(version)
 warn('not availabe for all this is beta version...')
 
-setfpscap(165)
-
 local Stats = game:GetService('Stats')
 local Players = game:GetService('Players')
 local RunService = game:GetService('RunService')
