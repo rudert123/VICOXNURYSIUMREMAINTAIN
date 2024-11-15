@@ -22,13 +22,13 @@ uiGradient.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(50,
 uiGradient.Rotation = 45
 
 local textLabel = Instance.new("TextLabel")
-textLabel.Text = "Credit\nRudert\nFless PE"
+textLabel.Text = "Credit: Rudert and Flezzpe"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.TextSize = 45
+textLabel.TextSize = 50
 textLabel.TextStrokeTransparency = 0.6
 textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 textLabel.TextWrapped = true
-textLabel.Size = UDim2.new(0, 500, 0, 150)
+textLabel.Size = UDim2.new(0, 550, 0, 200)
 textLabel.Position = UDim2.new(0.5, -250, 0.5, -75)
 textLabel.TextXAlignment = Enum.TextXAlignment.Center
 textLabel.TextYAlignment = Enum.TextYAlignment.Center
@@ -503,7 +503,7 @@ task.spawn(function()
 				if aura.is_spamming then
 					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then   
 						parry_remote:FireServer(
-							0.5,
+							0,
 							CFrame.new(camera.CFrame.Position, Vector3.zero),
 							{[closest_Entity.Name] = closest_Entity.HumanoidRootPart.Position},
 							{closest_Entity.HumanoidRootPart.Position.X, closest_Entity.HumanoidRootPart.Position.Y},
@@ -605,20 +605,15 @@ ping + ball_Speed / math.pi
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
 
-            local curve_intensity = 1.5
-            local random_curve = Vector3.new(
-                math.random(-150, 150) * curve_intensity,
-                math.random(-150, 150) * curve_intensity,
-                math.random(-150, 150) * curve_intensity
-            )
-
-            local parry_CFrame
-            if getgenv().auto_curve_Enabled and math.random() < 0.9 then
-                parry_CFrame = CFrame.new(camera.CFrame.Position, target_Position + random_curve)
-            else
-                parry_CFrame = CFrame.new(camera.CFrame.Position, target_Position)
-            end
-
+            if getgenv().auto_curve_Enabled 
+parry_remote:FireServer(
+				0,
+				CFrame.new(camera.CFrame.Position, Vector3.new(math.random(-1000, 1000), math.random(0, 1000), math.random(100, 1000))),
+				{[closest_Entity.Name] = target_Position},
+				{target_Position.X, target_Position.Y},
+				false
+			)
+                 else
             parry_remote:FireServer(
                 0.5,
                 parry_CFrame,
