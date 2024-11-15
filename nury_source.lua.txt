@@ -30,7 +30,8 @@ textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 textLabel.TextWrapped = true
 textLabel.Size = UDim2.new(0, 600, 0, 200)
 textLabel.Position = UDim2.new(0.5, -300, 0.5, -100)
-textLabel.TextAlignment = Enum.TextAlignment.Center  -- Memperbaiki kesalahan dengan enum yang benar
+textLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Ganti TextAlignment dengan TextXAlignment
+textLabel.TextYAlignment = Enum.TextYAlignment.Center  -- Ganti TextAlignment dengan TextYAlignment
 textLabel.Parent = frame
 
 local tweenService = game:GetService("TweenService")
@@ -58,7 +59,6 @@ fadeInTween.Completed:Connect(function()
         end)
     end)
 end)
-
 
 local version = 'Beta'
 
