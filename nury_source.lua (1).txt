@@ -489,7 +489,7 @@ ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function()
 end)
 
 task.spawn(function()
-    local previousPosition = closest_Entity.HumanoidRootPart.Position
+    local previousPosition = entity.HumanoidRootPart.Position
     local previousTime = tick()
 
     RunService.PreRender:Connect(function()
