@@ -489,27 +489,49 @@ local aura = {
 }
 
 task.spawn(function()
-	RunService.PreRender:Connect(function()
-		if not getgenv().aura_Enabled then
-			return
-		end
+    local previousPosition = closest_Entity.HumanoidRootPart.Position
+    local previousTime = tick()
 
-		if closest_Entity then
-			if workspace.Alive:FindFirstChild(closest_Entity.Name) then
-				if aura.is_spamming then
-					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then   
-						parry_remote:FireServer(
-							0,
-							CFrame.new(camera.CFrame.Position, Vector3.zero),
-							{[closest_Entity.Name] = closest_Entity.HumanoidRootPart.Position},
-							{closest_Entity.HumanoidRootPart.Position.X, closest_Entity.HumanoidRootPart.Position.Y},
-							false
-						)
-					end
-				end
-			end
-		end
-	end)
+    RunService.PreRender:Connect(function()
+        if not getgenv().aura_Enabled then
+            return
+        end
+
+        if closest_Entity then
+            if workspace.Alive:FindFirstChild(closest_Entity.Name) then
+                if aura.is_spamming then
+                    local currentPosition = closest_Entity.HumanoidRootPart.Position
+                    local currentTime = tick()
+
+                    local deltaPosition = currentPosition - previousPosition
+                    local deltaTime = currentTime - previousTime
+
+                    local speed = deltaTime > 0 and deltaPosition.Magnitude / deltaTime or 0  -- Kecepatan (studs per detik)
+
+                    -- Menyesuaikan waktu spam berdasarkan ping
+                    local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10  -- Mengambil nilai ping (dalam ms)
+                    local adjustedSpamDelay = math.max(0.1, 0.5 - ping / 1000)  -- Menyesuaikan delay spam berdasarkan ping
+
+                    if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then
+                        parry_remote:FireServer(
+                            speed,  -- Mengirim kecepatan ke server
+                            CFrame.new(camera.CFrame.Position, Vector3.zero),
+                            {[closest_Entity.Name] = closest_Entity.HumanoidRootPart.Position},
+                            {closest_Entity.HumanoidRootPart.Position.X, closest_Entity.HumanoidRootPart.Position.Y},
+                            false
+                        )
+
+                        -- Update posisi dan waktu untuk frame berikutnya
+                        previousPosition = currentPosition
+                        previousTime = currentTime
+
+                        -- Menunda eksekusi spam sesuai dengan delay yang disesuaikan
+                        task.wait(adjustedSpamDelay)
+                    end
+                end
+            end
+        end
+    end)
 
 	RunService.PreRender:Connect(function()
 		if not getgenv().aura_Enabled then
@@ -524,7 +546,7 @@ task.spawn(function()
 			aura.last_target = nil
 		end)
 
-		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
+		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 1000
 
 		local self = Nurysium_Util.getBall()
 
@@ -572,26 +594,9 @@ task.spawn(function()
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
                 aura.spam_Range = math.max(ping / 10, 10.5) + ball_Speed / 6.15
-		local speed_factor = 10    -- Faktor penyesuaian kecepatan bola
-local max_parry_range = math.huge -- Batas atas jarak parry
-local min_parry_range = 5  -- Batas bawah jarak parry
-local power = 1.5          -- Faktor daya untuk memperbesar pengaruh kecepatan
-local percentage = 0.25    -- Pengaruh kecepatan bola sebagai persentase
-local log_base = 10        -- Basis logaritma untuk kecepatan bola
-
--- Rumus penggabungan
-aura.parry_Range = ping_threshold + 
-    math.max(                          -- Menggunakan max untuk memastikan nilai tidak terlalu kecil
-        math.min(                        -- Menggunakan min untuk membatasi nilai kecepatan
-            math.pow(                    -- Memperbesar pengaruh kecepatan bola dengan daya
-                math.abs(ball_Speed) / speed_factor, power
-            ),
-            max_parry_range             -- Membatasi agar parry_range tidak lebih dari max_parry_range
-        ),
-        min_parry_range,                 -- Membatasi agar parry_range tidak kurang dari min_parry_range
-    ) + math.log(                        -- Menambahkan pengaruh logaritma untuk pertumbuhan lebih lambat
-        math.abs(ball_Speed) / speed_factor + 1, log_base
-    ) * percentage
+		speedFactor = 3 - (ping / 100)
+    speedFactorPingBased = 6.1 - (ping / 100)
+    aura.parry_Range = math.max(math.max(ping, 3.5) + ball_Speed / speedFactor, speedFactorPingBased)
 
 		if target_isMoving then
             aura.is_spamming = (aura.hit_Count > 1 or (target_Distance < 11 and ball_Distance < 10)) and ball_Dot > -0.25
@@ -632,13 +637,17 @@ aura.parry_Range = ping_threshold +
         false
     )
 else
-    parry_remote:FireServer(
-        0.5,
-        parry_CFrame,
-        {[closest_Entity.Name] = target_Position},
-        {target_Position.X, target_Position.Y},
-        false
-    )
+        local cf = camera.CFrame
+        local target_X = targetPosition.X
+        local target_Y = targetPosition.Y
+
+        originalParryRemote:FireServer(
+            0,
+            CFrame.new(cf.Position, predicted_ball_Position),
+            {[closest_Entity_To_mouse.Name] = targetPosition},
+            {target_X, target_Y},
+            false
+        )
 end
 
 			aura.can_parry = false
