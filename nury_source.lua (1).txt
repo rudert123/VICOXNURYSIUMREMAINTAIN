@@ -550,7 +550,7 @@ task.spawn(function()
 			aura.last_target = nil
 		end)
 
-		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 1000
+		local ping = Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 100
 
 		local self = Nurysium_Util.getBall()
 
@@ -628,6 +628,8 @@ task.spawn(function()
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
 
+local cf = camera.CFrame
+
             if getgenv().auto_curve_Enabled then
     parry_remote:FireServer(
         0,
@@ -641,17 +643,14 @@ task.spawn(function()
         false
     )
 else
-        local cf = camera.CFrame
-        local target_X = targetPosition.X
-        local target_Y = targetPosition.Y
-
-        originalParryRemote:FireServer(
-            0,
-            CFrame.new(cf.Position, predicted_ball_Position),
-            {[closest_Entity_To_mouse.Name] = targetPosition},
-            {target_X, target_Y},
-            false
-        )
+        local x, y, z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = cf:GetComponents()
+            parry_remote:FireServer(
+                0,
+                CFrame.new(x, y, z, R00, R01, R02, R10, R11, R12, R20, R21, R22),
+                {[closest_Entity.Name] = targetPosition},
+                {target_Position.X, target_Position.Y},
+                false
+            )
 end
 
 			aura.can_parry = false
