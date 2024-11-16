@@ -86,7 +86,8 @@ local Nurysium_Util = loadstring(game:HttpGet('https://raw.githubusercontent.com
 
 local local_player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
-
+local SpeedFactor
+local speedFactorPingBased
 local nurysium_Data = nil
 local hit_Sound = nil
 
