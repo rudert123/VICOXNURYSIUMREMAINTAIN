@@ -16,7 +16,7 @@ textLabel.Size = UDim2.new(1, 0, 1, 0)
 textLabel.BackgroundColor3 = Color3.fromRGB(0, 20, 40)
 textLabel.Font = Enum.Font.GothamMedium
 textLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-textLabel.Text = "Loading"
+textLabel.Text = "Loading Script VicoXNury"
 textLabel.TextSize = 28
 textLabel.Parent = screenGui
 
@@ -1107,7 +1107,7 @@ ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function(slash: 
 end)
 
 ConnectionsManager['auto_parry'] = RunService.PostSimulation:Connect(function()
-	getgenv().aura_Enabled = nterface.flags['auto_parry']
+	getgenv().aura_Enabled = interface.flags['auto_parry']
 
 
 	if not getgenv().aura_Enabled then
