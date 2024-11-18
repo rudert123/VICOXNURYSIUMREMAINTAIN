@@ -1,5 +1,14 @@
-local label = script.Parent:WaitForChild('textLabel')
-local sound = script.Parent:WaitForChild('Sound')
+local label = script.Parent:WaitForChild('textLabel', 10)  -- Tunggu selama 10 detik untuk textLabel
+local sound = script.Parent:WaitForChild('Sound', 10)  -- Tunggu selama 10 detik untuk Sound
+
+-- Cek apakah textLabel dan Sound ditemukan
+if not label then
+    warn("textLabel tidak ditemukan!")
+    return
+end
+
+if not sound then
+    warn("Sound tidak ditemukan!")
 
 wait(2)
 
