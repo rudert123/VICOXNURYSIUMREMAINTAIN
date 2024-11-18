@@ -152,7 +152,6 @@ local RunTime = workspace.Runtime
 local Alive = workspace.Alive
 local Dead = workspace.Dead
 
-getgenv().aura_Enabled = false
 getgenv().hit_sound_Enabled = false
 getgenv().hit_effect_Enabled = false
 getgenv().night_mode_Enabled = false
@@ -970,22 +969,6 @@ ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
 	end
 end)
 
---// aura
-
-local aura = {
-	can_parry = true,
-	is_spamming = false,
-
-	parry_Range = 25,
-	spam_Range = 0,  
-	hit_Count = 0,
-
-	hit_Time = tick(),
-	ball_Warping = tick(),
-	is_ball_Warping = false,
-	last_target = nil
-}
-
 --// AI
 
 task.defer(function()
@@ -1119,26 +1102,37 @@ ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function(slash: 
 		end
 	end)
 
-	if AutoParry.ball.properties.auto_spam then
+	if AutoParry.ball.properies.auto_spam then
 		AutoParry.perform_parry()
 	end
 end)
 
 ConnectionsManager['auto_parry'] = RunService.PostSimulation:Connect(function()
-	aura_Enabled = library.flags and library.flags['auto_parry']
-
-
-
-	if aura_Enabled then
-    getgenv().aura_Enabled = true
-else
+	-- Pastikan nilai default untuk getgenv().aura_Enabled
+if getgenv().aura_Enabled == nil then
     getgenv().aura_Enabled = false
 end
 
-if not aura_Enabled then
-    AutoParry.reset()
+-- Ambil status auto_parry dari library.flags jika tersedia
+local auto_parry_enabled = library.flags and library.flags['auto_parry']
+
+-- Perbarui getgenv().aura_Enabled berdasarkan auto_parry_enabled
+if auto_parry_enabled ~= nil then
+    getgenv().aura_Enabled = auto_parry_enabled
+end
+
+-- Jika aura_Enabled tidak aktif, reset AutoParry
+if not getgenv().aura_Enabled then
+    if AutoParry and typeof(AutoParry.reset) == "function" then
+        AutoParry.reset()
+    else
+        warn("AutoParry atau fungsi reset tidak ditemukan!")
+    end
     return
 end
+
+-- Tambahkan logika tambahan jika aura aktif
+-- Misalnya, lakukan sesuatu ketika getgenv().aura_Enabled = true
 
 	local Character = LocalPlayer.Character
 
