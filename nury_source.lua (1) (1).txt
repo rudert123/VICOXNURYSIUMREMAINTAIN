@@ -326,6 +326,119 @@ end
 
 resolve_parry_Remote()
 
+function AutoParry.perform_grab_animation()
+	local animation = ReplicatedStorage.Shared.SwordAPI.Collection.Default:FindFirstChild('GrabParry')
+	local currently_equipped = Player.Entity.properties.sword
+    
+	if not currently_equipped or currently_equipped == 'Titan Blade' then
+        return
+    end
+
+	if not animation then
+		return
+	end
+
+	local sword_data = ReplicatedStorage.Shared.ReplicatedInstances.Swords.GetSword:Invoke(currently_equipped)
+
+	if not sword_data or not sword_data['AnimationType'] then
+        return
+    end
+
+	local character = LocalPlayer.Character
+
+	if not character or not character:FindFirstChild('Humanoid') then
+		return
+	end
+
+	for _, object in ReplicatedStorage.Shared.SwordAPI.Collection:GetChildren() do
+        if object.Name ~= sword_data['AnimationType'] then
+            continue
+        end
+		
+		if not (object:FindFirstChild('GrabParry') or object:FindFirstChild('Grab')) then
+            continue
+        end
+
+		local sword_animation_type = 'GrabParry'
+
+		if object:FindFirstChild('Grab') then
+			sword_animation_type = 'Grab'
+		end
+
+        animation = object[type]
+    end
+
+	Player.properties.grab_animation = character.Humanoid:LoadAnimation(animation)
+	Player.properties.grab_animation:Play()
+end
+
+function AutoParry.perform_parry()
+    -- Mendapatkan properti bola dari AutoParry
+    local ball_properties = AutoParry.ball.properties
+
+    -- Jika cooldown aktif dan bukan auto spam, hentikan fungsi
+    if ball_properties.cooldown and not ball_properties.auto_spam then
+        return
+    end
+
+    -- Menambahkan jumlah parries dan menyimpan waktu parry terakhir
+    ball_properties.parries += 1
+    AutoParry.ball.properties.last_hit = tick()
+
+    -- Mendapatkan informasi kamera
+    local camera = workspace.CurrentCamera
+    local camera_direction = camera.CFrame.Position
+
+    -- Mendefinisikan arah awal
+    local direction = camera.CFrame
+    local target_position = AutoParry.entity_properties.server_position
+    
+    -- Jika bola tidak dalam mode auto spam
+    if not ball_properties.auto_spam then
+        -- Menjalankan animasi grab
+        AutoParry.perform_grab_animation()
+
+        -- Mengatur cooldown menjadi true
+        ball_properties.cooldown = true
+
+        -- Mengirimkan perintah FireServer untuk auto spam
+        ball_properties.parry_remote:FireServer(
+            0,
+            direction,
+            { [AutoParry.target.aim.Name] = target_position },
+            { target_position.X, target_position.Y },
+            false
+        )
+
+        -- Mengurangi jumlah parries setelah jeda waktu
+        task.delay(0.25, function()
+            if ball_properties.parries > 0 then
+                ball_properties.parries -= 1
+            end
+        end)
+
+        -- Mengakhiri fungsi jika auto spam aktif
+        return
+    end
+
+    -- Mengirimkan perintah FireServer untuk parry normal
+    ball_properties.parry_remote:FireServer(
+        0,
+        direction,
+        { [AutoParry.target.aim.Name] = target_position },
+        { target_position.X, target_position.Y },
+        false
+    )
+
+
+    -- Mengurangi jumlah parries setelah jeda waktu
+    task.delay(0.15, function()
+        if ball_properties.parries > 0 then
+            ball_properties.parries -= 1
+        end
+    end)
+end
+
 function walk_to(position)
 
 local_player.Character.Humanoid:MoveTo(position)
