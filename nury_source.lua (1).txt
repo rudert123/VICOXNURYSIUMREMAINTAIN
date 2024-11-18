@@ -79,22 +79,15 @@ local RobloxReplicatedStorage = game:GetService('RobloxReplicatedStorage')
 local RbxAnalyticsService = game:GetService('RbxAnalyticsService')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local UserInputService = game:GetService('UserInputService')
-local NetworkClient = game:GetService('NetworkClient')
 local TweenService = game:GetService('TweenService')
 local VirtualUser = game:GetService('VirtualUser')
-local HttpService = game:GetService('HttpService')
 local RunService = game:GetService('RunService')
-local LogService = game:GetService('LogService')
-local Lighting = game:GetService('Lighting')
-local CoreGui = game:GetService('CoreGui')
 local Players = game:GetService('Players')
 local Debris = game:GetService('Debris')
 local Stats = game:GetService('Stats')
 local Nurysium_Util = loadstring(game:HttpGet('https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua'))()
 
 local LocalPlayer = Players.LocalPlayer
-local client_id = RbxAnalyticsService:GetClientId()
-
 local camera = workspace.CurrentCamera
 local SpeedFactor
 local speedFactorPingBased
