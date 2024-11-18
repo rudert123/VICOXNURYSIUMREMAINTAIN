@@ -844,7 +844,7 @@ end)
 task.defer(function()
 	game:GetService("RunService").Heartbeat:Connect(function()
 
-		if not local_player.Character then
+		if not LocalPlayer.Character then
 			return
 		end
 
@@ -857,11 +857,11 @@ task.defer(function()
 				return
 			end
 
-			effect.Parent = local_player.Character.PrimaryPart
+			effect.Parent =  LocalPlayer.Character.PrimaryPart
 		else
 
-			if local_player.Character.PrimaryPart:FindFirstChild('nurysium_efx') then
-				local_player.Character.PrimaryPart['nurysium_efx']:Destroy()
+			if  LocalPlayer.Character.PrimaryPart:FindFirstChild('nurysium_efx') then
+				 LocalPlayer.Character.PrimaryPart['nurysium_efx']:Destroy()
 			end
 		end
 
@@ -873,7 +873,7 @@ end)
 task.defer(function()
 	game:GetService("RunService").Heartbeat:Connect(function()
 
-		if not local_player.Character then
+		if not LocalPlayer.Character then
 			return
 		end
 
@@ -882,23 +882,23 @@ task.defer(function()
 
 			trail.Name = 'nurysium_fx'
 
-			if local_player.Character.PrimaryPart:FindFirstChild('nurysium_fx') then
+			if local Character = LocalPlayer.Character.PrimaryPart:FindFirstChild('nurysium_fx') then
 				return
 			end
 
-			local Attachment0 = Instance.new("Attachment", local_player.Character.PrimaryPart)
-			local Attachment1 = Instance.new("Attachment", local_player.Character.PrimaryPart)
+			local Attachment0 = Instance.new("Attachment",  LocalPlayer.Character.PrimaryPart)
+			local Attachment1 = Instance.new("Attachment",  LocalPlayer.Character.PrimaryPart)
 
 			Attachment0.Position = Vector3.new(0, -2.411, 0)
 			Attachment1.Position = Vector3.new(0, 2.504, 0)
 
-			trail.Parent = local_player.Character.PrimaryPart
+			trail.Parent =  LocalPlayer.Character.PrimaryPart
 			trail.Attachment0 = Attachment0
 			trail.Attachment1 = Attachment1
 		else
 
-			if local_player.Character.PrimaryPart:FindFirstChild('nurysium_fx') then
-				local_player.Character.PrimaryPart['nurysium_fx']:Destroy()
+			if  LocalPlayer.Character.PrimaryPart:FindFirstChild('nurysium_fx') then
+				 LocalPlayer.Character.PrimaryPart['nurysium_fx']:Destroy()
 			end
 		end
 
@@ -974,7 +974,7 @@ end)
 
 task.defer(function()
     game:GetService("RunService").Heartbeat:Connect(function()
-        if getgenv().ai_Enabled and workspace.Alive:FindFirstChild(local_player.Character.Name) then
+        if getgenv().ai_Enabled and workspace.Alive:FindFirstChild( LocalPlayer.Character.Name) then
             local self = Nurysium_Util.getBall()
 
             if not self or not closest_Entity then
@@ -982,7 +982,7 @@ task.defer(function()
             end
 
             if not closest_Entity:FindFirstChild('HumanoidRootPart') then
-                walk_to(local_player.Character.HumanoidRootPart.Position + Vector3.new(math.sin(tick()) * math.random(35, 50), 0, math.cos(tick()) * math.random(35, 50)))
+                walk_to( LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(math.sin(tick()) * math.random(35, 50), 0, math.cos(tick()) * math.random(35, 50)))
                 return
             end
 
@@ -990,20 +990,20 @@ task.defer(function()
             local ball_Speed = self.AssemblyLinearVelocity.Magnitude
             local ball_Distance = local_player:DistanceFromCharacter(ball_Position)
 
-            local player_Position = local_player.Character.PrimaryPart.Position
+            local player_Position =  LocalPlayer.Character.PrimaryPart.Position
 
             local target_Position = closest_Entity.HumanoidRootPart.Position
-            local target_Distance = local_player:DistanceFromCharacter(target_Position)
+            local target_Distance = LocalPlayer:DistanceFromCharacter(target_Position)
             local target_LookVector = closest_Entity.HumanoidRootPart.CFrame.LookVector
 
             local resolved_Position = Vector3.zero
 
             local target_Humanoid = closest_Entity:FindFirstChildOfClass("Humanoid")
             if target_Humanoid and target_Humanoid:GetState() == Enum.HumanoidStateType.Jumping and local_player.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
-                local_player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
 
-            if (ball_Position - player_Position):Dot(local_player.Character.PrimaryPart.CFrame.LookVector) < -0.2 and tick() % 4 <= 2 then
+            if (ball_Position - player_Position):Dot(LocalPlayer.Character.PrimaryPart.CFrame.LookVector) < -0.2 and tick() % 4 <= 2 then
                 return
             end
 
