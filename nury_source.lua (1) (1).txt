@@ -11,14 +11,13 @@ screenGui.Parent = playerGui
 
 local textLabel = Instance.new("TextLabel")
 textLabel.Size = UDim2.new(1, 0, 1, 0)
-textLabel.BackgroundTransparency = 1
+textLabel.BackgroundColor3 = Color3.fromRGB(0, 20, 40)
 textLabel.Font = Enum.Font.GothamMedium
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.Text = "Loading Script VicoXNury"
 textLabel.TextSize = 36
 textLabel.TextStrokeTransparency = 0.5
 textLabel.TextStrokeColor3 = Color3.fromRGB(0, 255, 255)
-textLabel.TextTransparency = 1
 textLabel.Parent = screenGui
 
 local loadingRing = Instance.new("ImageLabel")
@@ -31,18 +30,23 @@ loadingRing.Parent = screenGui
 
 ReplicatedFirst:RemoveDefaultLoadingScreen()
 
+-- Tweak untuk animasi teks
 local zoomTweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
 local zoomTween = TweenService:Create(textLabel, zoomTweenInfo, {TextSize = 48})
 
+-- Animasi putar untuk loading ring
 local rotateTweenInfo = TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, -1, true)
 local rotateTween = TweenService:Create(loadingRing, rotateTweenInfo, {Rotation = 360})
 
+-- Tween untuk perubahan warna teks
 local colorTweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut, -1, true)
 local colorTween = TweenService:Create(textLabel, colorTweenInfo, {TextColor3 = Color3.fromRGB(255, 0, 0)})
 
+-- Tween untuk pergerakan teks
 local moveTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local moveTween = TweenService:Create(textLabel, moveTweenInfo, {Position = UDim2.new(0.5, 0, 0.6, 0)})
 
+-- Play semua animasi
 zoomTween:Play()
 rotateTween:Play()
 colorTween:Play()
@@ -142,10 +146,16 @@ game:GetService("VirtualUser")
 local Players = game:GetService('Players')
 local Debris = game:GetService('Debris')
 local Stats = game:GetService('Stats')
-local Nurysium_Util = loadstring(game:HttpGet('https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua'))()
 
 local local_player = Players.LocalPlayer
+local client_id = RbxAnalyticsService:GetClientId()
 local camera = workspace.CurrentCamera
+
+local assets = game:GetObjects('rbxassetid://98657300657778')[1]
+
+assets.Parent = RobloxReplicatedStorage
+assets.Name = names_map['protected']
+
 
 local nurysium_Data = nil
 local hit_Sound = nil
