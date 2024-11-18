@@ -139,7 +139,6 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local Character = LocalPlayer.Character
 local LocalPlayer = Players.LocalPlayer
 local client_id = RbxAnalyticsService:GetClientId()
 local camera = workspace.CurrentCamera
@@ -152,6 +151,7 @@ local hit_Sound = nil
 local RunTime = workspace.Runtime
 local Alive = workspace.Alive
 local Dead = workspace.Dead
+local Character = LocalPlayer.Character
 
 getgenv().hit_sound_Enabled = false
 getgenv().hit_effect_Enabled = false
