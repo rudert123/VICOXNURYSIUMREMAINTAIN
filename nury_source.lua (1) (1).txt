@@ -1093,15 +1093,6 @@ RunService.PreSimulation:Connect(function()
 end)
 
 ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function(slash: any, root: any)
-
-local Character = LocalPlayer.Character
-
-	task.spawn(function()
-		if root.Parent and root.Parent ~= LocalPlayer.Character then
-			if root.Parent.Parent ~= Alive then
-				return
-			end
-	
 			AutoParry.ball.properties.cooldown = false
 		end
 	end)
