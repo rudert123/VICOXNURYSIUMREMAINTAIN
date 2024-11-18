@@ -114,61 +114,6 @@ local Services = {
 	game:GetService('SocialService')
 }
 
-function Player:get_aim_entity()
-	local closest_entity = nil
-	local minimal_dot_product = -math.huge
-	local camera_direction = workspace.CurrentCamera.CFrame.LookVector
-
-	for _, player in Alive:GetChildren() do
-		if not player then
-			continue
-		end
-
-		if player.Name ~= LocalPlayer.Name then
-			if not player:FindFirstChild('HumanoidRootPart') then
-				continue
-			end
-
-			local entity_direction = (player.HumanoidRootPart.Position - workspace.CurrentCamera.CFrame.Position).Unit
-			local dot_product = camera_direction:Dot(entity_direction)
-	
-			if dot_product > minimal_dot_product then
-				minimal_dot_product = dot_product
-				closest_entity = player
-			end
-		end
-	end
-
-	return closest_entity
-end
-
-function Player:get_closest_player_to_cursor()
-    local closest_player = nil
-    local minimal_dot_product = -math.huge
-
-    for _, player in workspace.Alive:GetChildren() do
-        if player == LocalPlayer.Character then
-            continue
-        end
-        
-        if player.Parent ~= Alive then
-            continue
-        end
-
-        local player_direction = (player.PrimaryPart.Position - workspace.CurrentCamera.CFrame.Position).Unit
-        local pointer = World.get_pointer()
-        local dot_product = pointer.LookVector:Dot(player_direction)
-
-        if dot_product > minimal_dot_product then
-            minimal_dot_product = dot_product
-            closest_player = player
-        end
-    end
-
-    return closest_player
-end
-
-
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_ui.lua"))()
 task.wait(0.5)
 
@@ -178,6 +123,121 @@ library:create_section("Combat", 17440545793)
 library:create_section("World", 17440865331)
 --// library:create_section("Misc", 17440868530)
 --// library:create_section("Settings", 17440866925)
+
+local AutoParry = {
+	ball = nil,
+	target = nil,
+	entity_properties = nil
+}
+
+local Player = {
+	Entity = nil,
+
+	properties = {
+		grab_animation = nil
+	}
+}
+
+Player.Entity = {
+    properties = {
+		sword = '',
+		server_position = Vector3.zero,
+		velocity = Vector3.zero,
+		position = Vector3.zero,
+        is_moving = false,
+		speed = 0,
+		ping = 0
+    }
+}
+
+local World = {}
+
+AutoParry.ball = {
+	training_ball_entity = nil,
+	client_ball_entity = nil,
+    ball_entity = nil,
+    
+    properties = {
+		aero_dynamic_time = tick(),
+		hell_hook_completed = true,
+		last_position = Vector3.zero,
+		rotation = Vector3.zero,
+		position = Vector3.zero,
+		last_warping = tick(),
+        parry_remote = nil,
+		is_curved = false,
+		last_tick = tick(),
+        auto_spam = false,
+        cooldown = false,
+		respawn_time = 0,
+        parry_range = 5,
+        spam_range = 0,
+        maximum_speed = 0,
+		old_speed = 0,
+        parries = 0,
+		direction = 0,
+        distance = 0,
+        velocity = 0,
+        last_hit = 0,
+		lerp_radians = 0,
+		radians = 0,
+		speed = 0,
+		dot = 0
+    }
+}
+
+AutoParry.target = {
+    current = nil,
+    from = nil,
+    aim = nil,
+}
+
+AutoParry.entity_properties = {
+    server_position = Vector3.zero,
+	velocity = Vector3.zero,
+	is_moving = false,
+	direction = 0,
+	distance = 0,
+	speed = 0,
+	dot = 0
+}
+
+local function linear_predict(a: any, b: any, time_volume: number)
+    return a + (b - a) * time_volume
+end
+
+
+
+function World:get_pointer()
+    local mouse_location = UserInputService:GetMouseLocation()
+    local ray = workspace.CurrentCamera:ScreenPointToRay(mouse_location.X, mouse_location.Y, 0)
+
+    return CFrame.lookAt(ray.Origin, ray.Origin + ray.Direction)
+end
+
+function AutoParry.get_ball()
+    for _, ball in workspace.Balls:GetChildren() do
+        if ball:GetAttribute("realBall") then
+            return ball
+        end
+    end
+end
+
+function AutoParry.get_client_ball()
+    for _, ball in workspace.Balls:GetChildren() do
+        if not ball:GetAttribute("realBall") then
+            return ball
+        end
+    end
+end
+
+local function getTrainingBall()
+	for index, ball in workspace:WaitForChild("TrainingBalls"):GetChildren() do
+		if ball:IsA("BasePart") and ball:GetAttribute("realBall") then
+			return ball
+		end
+	end
+end
 
 function initializate(dataFolder_name: string)
 	local nurysium_Data = Instance.new('Folder', game:GetService('CoreGui'))
