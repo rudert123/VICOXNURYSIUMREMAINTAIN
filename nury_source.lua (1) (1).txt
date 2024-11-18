@@ -239,6 +239,60 @@ local function getTrainingBall()
 	end
 end
 
+function Player:get_aim_entity()
+	local closest_entity = nil
+	local minimal_dot_product = -math.huge
+	local camera_direction = workspace.CurrentCamera.CFrame.LookVector
+
+	for _, player in Alive:GetChildren() do
+		if not player then
+			continue
+		end
+
+		if player.Name ~= LocalPlayer.Name then
+			if not player:FindFirstChild('HumanoidRootPart') then
+				continue
+			end
+
+			local entity_direction = (player.HumanoidRootPart.Position - workspace.CurrentCamera.CFrame.Position).Unit
+			local dot_product = camera_direction:Dot(entity_direction)
+	
+			if dot_product > minimal_dot_product then
+				minimal_dot_product = dot_product
+				closest_entity = player
+			end
+		end
+	end
+
+	return closest_entity
+end
+
+function Player:get_closest_player_to_cursor()
+    local closest_player = nil
+    local minimal_dot_product = -math.huge
+
+    for _, player in workspace.Alive:GetChildren() do
+        if player == LocalPlayer.Character then
+            continue
+        end
+        
+        if player.Parent ~= Alive then
+            continue
+        end
+
+        local player_direction = (player.PrimaryPart.Position - workspace.CurrentCamera.CFrame.Position).Unit
+        local pointer = World.get_pointer()
+        local dot_product = pointer.LookVector:Dot(player_direction)
+
+        if dot_product > minimal_dot_product then
+            minimal_dot_product = dot_product
+            closest_player = player
+        end
+    end
+
+    return closest_player
+end
+
 function initializate(dataFolder_name: string)
 	local nurysium_Data = Instance.new('Folder', game:GetService('CoreGui'))
 	nurysium_Data.Name = dataFolder_name
