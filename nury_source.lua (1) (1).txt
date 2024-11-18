@@ -439,6 +439,230 @@ function AutoParry.perform_parry()
     end)
 end
 
+function AutoParry.reset()
+	AutoParry.ball.properties.is_curved = false
+    AutoParry.ball.properties.auto_spam = false
+    AutoParry.ball.properties.cooldown = false
+    AutoParry.ball.properties.maximum_speed = 0
+    AutoParry.ball.properties.parries = 0
+	AutoParry.entity_properties.server_position = Vector3.zero
+	AutoParry.target.current = nil
+	AutoParry.target.from = nil
+end
+
+ReplicatedStorage.Remotes.PlrHellHooked.OnClientEvent:Connect(function(hooker: Model)
+	if hooker.Name == LocalPlayer.Name then
+		AutoParry.ball.properties.hell_hook_completed = true
+
+		return
+	end
+
+	AutoParry.ball.properties.hell_hook_completed = false
+end)
+
+ReplicatedStorage.Remotes.PlrHellHookCompleted.OnClientEvent:Connect(function()
+	AutoParry.ball.properties.hell_hook_completed = true
+end)
+
+function AutoParry.is_curved()
+	local target = AutoParry.target.current
+
+	if not target then
+		return false
+	end
+
+	local ball_properties = AutoParry.ball.properties
+	local current_target = AutoParry.target.current.Name
+
+	if target.PrimaryPart:FindFirstChild('MaxShield') and current_target ~= LocalPlayer.Name and ball_properties.distance < 50 then
+		return false
+	end
+
+	if AutoParry.ball.ball_entity:FindFirstChild('TimeHole1') and current_target ~= LocalPlayer.Name and ball_properties.distance < 100 then
+		ball_properties.auto_spam = false
+		
+		return false
+	end
+
+	if AutoParry.ball.ball_entity:FindFirstChild('WEMAZOOKIEGO') and current_target ~= LocalPlayer.Name and ball_properties.distance < 100 then
+		return false
+	end
+
+	if AutoParry.ball.ball_entity:FindFirstChild('At2') and ball_properties.speed <= 0 then
+		return true
+	end
+
+	if AutoParry.ball.ball_entity:FindFirstChild('AeroDynamicSlashVFX') then
+		Debris:AddItem(AutoParry.ball.ball_entity.AeroDynamicSlashVFX, 0)
+
+		ball_properties.auto_spam = false
+		ball_properties.aero_dynamic_time = tick()
+	end
+
+	if RunTime:FindFirstChild('Tornado') then
+		if ball_properties.distance > 5 and (tick() - ball_properties.aero_dynamic_time) < (RunTime.Tornado:GetAttribute("TornadoTime") or 1) + 0.314159 then
+			return true
+		end
+	end
+
+	if not ball_properties.hell_hook_completed and target.Name == LocalPlayer.Name and ball_properties.distance > 5 - math.random() then
+		return true
+	end
+	
+	local ball_direction = ball_properties.velocity.Unit
+	local ball_speed = ball_properties.speed
+	
+	local speed_threshold = math.min(ball_speed / 100, 40)
+	local angle_threshold = 40 * math.max(ball_properties.dot, 0)
+
+	local player_ping = Player.Entity.properties.ping
+
+	local accurate_direction = ball_properties.velocity.Unit
+	accurate_direction *= ball_direction
+
+	local direction_difference = (accurate_direction - ball_properties.velocity).Unit
+	local accurate_dot = ball_properties.direction:Dot(direction_difference)
+	local dot_difference = ball_properties.dot - accurate_dot
+	local dot_threshold = 0.5 - player_ping / 1000
+
+	local reach_time = ball_properties.distance / ball_properties.maximum_speed - (player_ping / 1000)
+	local enough_speed = ball_properties.maximum_speed > 100
+
+	local ball_distance_threshold = 15 - math.min(ball_properties.distance / 1000, 15) + angle_threshold + speed_threshold
+	
+	if enough_speed and reach_time > player_ping / 10 then
+        ball_distance_threshold = math.max(ball_distance_threshold - 15, 15)
+    end
+	
+	if ball_properties.distance < ball_distance_threshold then
+		return false
+	end
+
+	if dot_difference < dot_threshold then
+		return true
+	end
+
+	if ball_properties.lerp_radians < 0.018 then
+		ball_properties.last_curve_position = ball_properties.position
+		ball_properties.last_warping = tick() 
+	end
+
+	if (tick() - ball_properties.last_warping) < (reach_time / 1.5) then
+		return true
+	end
+
+	return ball_properties.dot < dot_threshold
+end
+
+local old_from_target = nil :: Model
+
+function AutoParry:is_spam() 
+
+	local target = AutoParry.target.current
+
+	if not target then
+		return false
+	end
+
+	if AutoParry.target.from ~= LocalPlayer.Character then
+		old_from_target = AutoParry.target.from
+	end
+
+	if self.parries < 3 and AutoParry.target.from == old_from_target then
+		return false
+	end
+
+	local player_ping = Player.Entity.properties.ping
+	local distance_threshold = 18 + (player_ping / 80)
+
+	local ball_properties = AutoParry.ball.properties
+	local reach_time = ball_properties.distance / ball_properties.maximum_speed - (player_ping / 1000)
+
+	if (tick() - self.last_hit) > 0.8 and self.entity_distance > distance_threshold and self.parries < 3 then
+		self.parries = 1
+
+		return false
+	end
+
+ 	if ball_properties.lerp_radians > 0.028 then
+		if self.parries > 3 then
+			self.parries = 1
+		end
+
+		return false
+	end
+
+	if (tick() - ball_properties.last_warping) < (reach_time / 1.3) and self.entity_distance > distance_threshold and self.parries < 4 then
+		if self.parries > 3 then
+			self.parries = 1
+		end
+
+		return false
+	end
+
+	if math.abs(self.speed - self.old_speed) < 5.2 and self.entity_distance > distance_threshold and self.speed < 60 and self.parries < 3 then
+		if self.parries > 3 then
+			self.parries = 0
+		end
+
+		return false
+	end
+	
+	if self.speed < 10 then
+		self.parries = 1
+
+		return false
+	end
+
+	if self.maximum_speed < self.speed and self.entity_distance > distance_threshold then
+		self.parries = 1
+		
+		return false
+	end
+
+	if self.entity_distance > self.range and self.entity_distance > distance_threshold then
+		if self.parries > 2 then
+			self.parries = 1
+		end
+
+		return false
+	end
+
+	if self.ball_distance > self.range and self.entity_distance > distance_threshold then
+		if self.parries > 2 then
+			self.parries = 2
+		end
+
+		return false
+	end
+
+	if self.last_position_distance > self.spam_accuracy and self.entity_distance > distance_threshold then
+		if self.parries > 4 then
+			self.parries = 2
+		end
+
+		return false
+	end
+
+	if self.ball_distance > self.spam_accuracy and self.ball_distance > distance_threshold then
+		if self.parries > 3 then
+			self.parries = 2
+		end
+
+		return false
+	end
+
+	if self.entity_distance > self.spam_accuracy and self.entity_distance > (distance_threshold - math.pi) then
+		if self.parries > 3 then
+			self.parries = 2
+		end
+
+		return false
+	end
+
+    return true	
+end
+
 function walk_to(position)
 
 local_player.Character.Humanoid:MoveTo(position)
