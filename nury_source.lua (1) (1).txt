@@ -302,27 +302,6 @@ function initializate(dataFolder_name: string)
 	hit_Sound.Volume = 6
 end
 
-local function get_closest_entity(Object: Part)
-	task.spawn(function()
-		local closest
-		local max_distance = math.huge
-
-		for index, entity in workspace.Alive:GetChildren() do
-			if entity.Name ~= Players.LocalPlayer.Name then
-				local distance = (Object.Position - entity.HumanoidRootPart.Position).Magnitude
-
-				if distance < max_distance then
-					closest_Entity = entity
-					max_distance = distance
-				end
-
-			end
-		end
-
-		return closest_Entity
-	end)
-end
-
 local function get_center()
 	for _, object in workspace.Map:GetDescendants() do
 		if object.Name == 'BALLSPAWN' then
