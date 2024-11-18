@@ -1,51 +1,33 @@
-local label = script.Parent:WaitForChild('textLabel', 10)  -- Tunggu selama 10 detik untuk textLabel
-local sound = script.Parent:WaitForChild('Sound', 10)  -- Tunggu selama 10 detik untuk Sound
+local TweenService = game:GetService("TweenService")
 
--- Cek apakah textLabel dan Sound ditemukan
-if not label then
-    warn("textLabel tidak ditemukan!")
-    return
-end
+-- Membuat TextLabel untuk menampilkan teks "Loading Script VicoXNury"
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.BackgroundTransparency = 1  -- Menghapus latar belakang
+textLabel.Font = Enum.Font.GothamMedium
+textLabel.TextColor3 = Color3.new(1, 1, 1)  -- Warna teks putih
+textLabel.Text = "Loading Script VicoXNury"
+textLabel.TextSize = 36  -- Ukuran teks lebih besar
+textLabel.TextStrokeTransparency = 0.5  -- Menambahkan efek stroke pada teks
+textLabel.TextStrokeColor3 = Color3.fromRGB(0, 255, 255)  -- Warna stroke cyan
+textLabel.TextTransparency = 1  -- Awalnya transparan
+textLabel.Parent = screenGui
 
-if not sound then
-    warn("Sound tidak ditemukan!")
+-- Animasi masuk (Fade In)
+local fadeInTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+local fadeInTween = TweenService:Create(textLabel, fadeInTweenInfo, {TextTransparency = 0})
 
-wait(2)
+-- Animasi bergerak ke atas
+local moveTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Back, Enum.EasingDirection.Out, -1, true)
+local moveTween = TweenService:Create(textLabel, moveTweenInfo, {Position = UDim2.new(0.5, 0, 0.4, 0)})
 
--- Variabel untuk memeriksa kondisi, misalnya, status Blade Ball atau sesuatu yang relevan
-local bladeBallStatus = true  -- Misalnya, status Blade ball yang bisa berubah tergantung pada keadaan game
-local loadingStatus = true    -- Status loading untuk script
+-- Menjalankan animasi fade in dan bergerak
+fadeInTween:Play()
+moveTween:Play()
 
--- Teks yang akan ditampilkan berdasarkan kondisi
-local function getDynamicText()
-    if bladeBallStatus then
-        return [[Loading the Script will take a few moments...
-Blade ball detected: Active
-Preparing to synchronize with the game engine.
-Please wait while the process is initialized.
-]]
-    else
-        return [[Loading the Script will take a few moments...
-Blade ball status: Idle
-Initial setup in progress, please wait.
-]]
-    end
-end
-
-local function displayText()
-    label.Text = ''
-    local text = getDynamicText()  -- Ambil teks dinamis yang tergantung pada kondisi
-    
-    for _, line in ipairs(text:split('\n')) do
-        sound:Play()  -- Memutar suara setiap kali ada baris baru
-        label.Text = label.Text .. line .. '\n'
-        wait(0.1)
-    end
-    wait(5)  -- Tunggu beberapa detik setelah menampilkan teks
-    label.Text = ''  -- Menghapus teks setelah selesai
-end
-
-displayText()
+-- Menghapus TextLabel setelah animasi selesai
+task.wait(5)  -- Menunggu 5 detik sebelum menghapus
+textLabel:Destroy()
 
 --// Vico (Rudert) Recode
 print("Script that i will revive...🥳")
@@ -141,13 +123,16 @@ local Players = game:GetService('Players')
 local Debris = game:GetService('Debris')
 local Stats = game:GetService('Stats')
 
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
 local local_player = Players.LocalPlayer
 local client_id = RbxAnalyticsService:GetClientId()
 local camera = workspace.CurrentCamera
 
 local assets = game:GetObjects('rbxassetid://98657300657778')[1]
 
-assets.Parent = RobloxReplicatedStorage
 assets.Name = names_map['protected']
 
 
