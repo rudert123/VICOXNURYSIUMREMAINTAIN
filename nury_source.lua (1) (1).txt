@@ -1,64 +1,42 @@
-local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local TweenService = game:GetService("TweenService")
+local label = script.Parent:WaitForChild('textLabel')
+local sound = script.Parent:WaitForChild('Sound')
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+wait(2)
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.IgnoreGuiInset = true
-screenGui.Parent = playerGui
+-- Variabel untuk memeriksa kondisi, misalnya, status Blade Ball atau sesuatu yang relevan
+local bladeBallStatus = true  -- Misalnya, status Blade ball yang bisa berubah tergantung pada keadaan game
+local loadingStatus = true    -- Status loading untuk script
 
-local textLabel = Instance.new("TextLabel")
-textLabel.Size = UDim2.new(1, 0, 1, 0)
-textLabel.BackgroundColor3 = Color3.fromRGB(0, 20, 40)
-textLabel.Font = Enum.Font.GothamMedium
-textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.Text = "Loading Script VicoXNury"
-textLabel.TextSize = 36
-textLabel.TextStrokeTransparency = 0.5
-textLabel.TextStrokeColor3 = Color3.fromRGB(0, 255, 255)
-textLabel.Parent = screenGui
-
-local loadingRing = Instance.new("ImageLabel")
-loadingRing.Size = UDim2.new(0, 256, 0, 256)
-loadingRing.BackgroundTransparency = 1
-loadingRing.Image = "rbxassetid://4965945816"
-loadingRing.AnchorPoint = Vector2.new(0.5, 0.5)
-loadingRing.Position = UDim2.new(0.5, 0, 0.5, 0)
-loadingRing.Parent = screenGui
-
-ReplicatedFirst:RemoveDefaultLoadingScreen()
-
--- Tweak untuk animasi teks
-local zoomTweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-local zoomTween = TweenService:Create(textLabel, zoomTweenInfo, {TextSize = 48})
-
--- Animasi putar untuk loading ring
-local rotateTweenInfo = TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, -1, true)
-local rotateTween = TweenService:Create(loadingRing, rotateTweenInfo, {Rotation = 360})
-
--- Tween untuk perubahan warna teks
-local colorTweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut, -1, true)
-local colorTween = TweenService:Create(textLabel, colorTweenInfo, {TextColor3 = Color3.fromRGB(255, 0, 0)})
-
--- Tween untuk pergerakan teks
-local moveTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local moveTween = TweenService:Create(textLabel, moveTweenInfo, {Position = UDim2.new(0.5, 0, 0.6, 0)})
-
--- Play semua animasi
-zoomTween:Play()
-rotateTween:Play()
-colorTween:Play()
-moveTween:Play()
-
-task.wait(5)
-
-if not game:IsLoaded() then
-    game.Loaded:Wait()
+-- Teks yang akan ditampilkan berdasarkan kondisi
+local function getDynamicText()
+    if bladeBallStatus then
+        return [[Loading the Script will take a few moments...
+Blade ball detected: Active
+Preparing to synchronize with the game engine.
+Please wait while the process is initialized.
+]]
+    else
+        return [[Loading the Script will take a few moments...
+Blade ball status: Idle
+Initial setup in progress, please wait.
+]]
+    end
 end
 
-screenGui:Destroy()
+local function displayText()
+    label.Text = ''
+    local text = getDynamicText()  -- Ambil teks dinamis yang tergantung pada kondisi
+    
+    for _, line in ipairs(text:split('\n')) do
+        sound:Play()  -- Memutar suara setiap kali ada baris baru
+        label.Text = label.Text .. line .. '\n'
+        wait(0.1)
+    end
+    wait(5)  -- Tunggu beberapa detik setelah menampilkan teks
+    label.Text = ''  -- Menghapus teks setelah selesai
+end
+
+displayText()
 
 --// Vico (Rudert) Recode
 print("Script that i will revive...🥳")
