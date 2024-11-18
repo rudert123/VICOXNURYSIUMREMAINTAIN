@@ -1,5 +1,5 @@
 --// Vico (Rudert) Recode
-print("Script that i will revive!")
+print("Script that i will revive...😹")
 wait(2)
 
 local screenGui = Instance.new("ScreenGui")
