@@ -139,7 +139,8 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local local_player = Players.LocalPlayer
+local Character = LocalPlayer.Character
+local LocalPlayer = Players.LocalPlayer
 local client_id = RbxAnalyticsService:GetClientId()
 local camera = workspace.CurrentCamera
 
