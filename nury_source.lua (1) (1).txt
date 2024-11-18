@@ -1,33 +1,45 @@
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local TweenService = game:GetService("TweenService")
 
--- Membuat TextLabel untuk menampilkan teks "Loading Script VicoXNury"
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
+
 local textLabel = Instance.new("TextLabel")
 textLabel.Size = UDim2.new(1, 0, 1, 0)
-textLabel.BackgroundTransparency = 1  -- Menghapus latar belakang
+textLabel.BackgroundColor3 = Color3.fromRGB(0, 20, 40)
 textLabel.Font = Enum.Font.GothamMedium
-textLabel.TextColor3 = Color3.new(1, 1, 1)  -- Warna teks putih
-textLabel.Text = "Loading Script VicoXNury"
-textLabel.TextSize = 36  -- Ukuran teks lebih besar
-textLabel.TextStrokeTransparency = 0.5  -- Menambahkan efek stroke pada teks
-textLabel.TextStrokeColor3 = Color3.fromRGB(0, 255, 255)  -- Warna stroke cyan
-textLabel.TextTransparency = 1  -- Awalnya transparan
+textLabel.TextColor3 = Color3.new(0.5, 0.5, 0.5)
+textLabel.Text = "Loading..."
+textLabel.TextSize = 28
 textLabel.Parent = screenGui
 
--- Animasi masuk (Fade In)
-local fadeInTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-local fadeInTween = TweenService:Create(textLabel, fadeInTweenInfo, {TextTransparency = 0})
+local loadingRing = Instance.new("ImageLabel")
+loadingRing.Size = UDim2.new(0, 256, 0, 256)
+loadingRing.BackgroundTransparency = 1
+loadingRing.Image = "rbxassetid://4965945816"
+loadingRing.AnchorPoint = Vector2.new(0.5, 0.5)
+loadingRing.Position = UDim2.new(0.5, 0, 0.5, 0)
+loadingRing.Parent = screenGui
 
--- Animasi bergerak ke atas
-local moveTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Back, Enum.EasingDirection.Out, -1, true)
-local moveTween = TweenService:Create(textLabel, moveTweenInfo, {Position = UDim2.new(0.5, 0, 0.4, 0)})
+-- Remove the default loading screen
+ReplicatedFirst:RemoveDefaultLoadingScreen()
 
--- Menjalankan animasi fade in dan bergerak
-fadeInTween:Play()
-moveTween:Play()
+local tweenInfo = TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1)
+local tween = TweenService:Create(loadingRing, tweenInfo, {Rotation = 360})
+tween:Play()
 
--- Menghapus TextLabel setelah animasi selesai
-task.wait(5)  -- Menunggu 5 detik sebelum menghapus
-textLabel:Destroy()
+task.wait(5)  -- Force screen to appear for a minimum number of seconds
+
+if not game:IsLoaded() then
+ game.Loaded:Wait()
+end
+
+screenGui:Destroy()
 
 --// Vico (Rudert) Recode
 print("Script that i will revive...🥳")
@@ -49,7 +61,7 @@ uiGradient.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(50,
 uiGradient.Rotation = 45
 
 local textLabel = Instance.new("TextLabel")
-textLabel.Text = "Credit: Rudert and Flezzpe"
+textLabel.Text = "Own : Rudert and Flezzpe"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextSize = 50
 textLabel.TextStrokeTransparency = 0.6
@@ -132,9 +144,6 @@ local client_id = RbxAnalyticsService:GetClientId()
 local camera = workspace.CurrentCamera
 
 local assets = game:GetObjects('rbxassetid://98657300657778')[1]
-
-assets.Name = names_map['protected']
-
 
 local nurysium_Data = nil
 local hit_Sound = nil
@@ -260,7 +269,7 @@ end
 
 
 function ConnectionsManager:abadone()
-	interface.flags = {}
+	library.flags = {}
 	
 	for _, connection in ConnectionsManager do
 		if typeof(connection) == 'function' then
@@ -380,21 +389,33 @@ local function get_center()
 	end
 end
 
-function resolve_parry_Remote()
- local temp_remote = game:GetService("VirtualUser"):WaitForChild("\n\n\n\n\n")
+local platform = game:GetService("UserInputService").TouchEnabled and "Android" or "PC"
 
-    if not temp_remote then
-        return
+print("Platform detected:", platform)
+
+function AutoParry.get_parry_remote()
+    while true do
+        local found = false
+        for _, object in { game:GetService('VirtualUser') } do
+            local temp_remote = object:FindFirstChildOfClass('RemoteEvent')
+
+            if temp_remote and temp_remote.Name:find('\n') then
+                AutoParry.ball.properties.parry_remote = temp_remote
+                found = true
+                print("RemoteEvent found platform:", platform)
+                break
+            end
+        end
+
+        if found then
+            break
+        end
+
+        wait(0.1)
     end
-
-    if not temp_remote:IsA('RemoteEvent') then
-        return
-    end
-
-    parry_remote = temp_remote
 end
 
-resolve_parry_Remote()
+AutoParry.get_parry_remote()
 
 function AutoParry.perform_grab_animation()
 	local animation = ReplicatedStorage.Shared.SwordAPI.Collection.Default:FindFirstChild('GrabParry')
