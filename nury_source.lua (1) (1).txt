@@ -1107,14 +1107,20 @@ ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function(slash: 
 end)
 
 ConnectionsManager['auto_parry'] = RunService.PostSimulation:Connect(function()
-	getgenv().aura_Enabled = interface.flags['auto_parry']
+	aura_Enabled = library.flags and library.flags['auto_parry']
 
 
-	if not getgenv().aura_Enabled then
-		AutoParry.reset()
 
-        return
-    end
+	if aura_Enabled then
+    getgenv().aura_Enabled = true
+else
+    getgenv().aura_Enabled = false
+end
+
+if not aura_Enabled then
+    AutoParry.reset()
+    return
+end
 
 	local Character = LocalPlayer.Character
 
